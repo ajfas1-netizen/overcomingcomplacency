@@ -46,7 +46,7 @@ Or simply open `index.html` in a browser.
 - **Content** — all book-derived copy (quiz questions, step content, challenge days, quotes) lives in `js/data.js`
 - **Brand** — colors and fonts are CSS variables at the top of `css/styles.css` (currently a Maxwell-inspired deep navy + road-line gold). Swap them to match the final cover art.
 - **Email signup** — the form in the Connect section is a demo. Replace the handler at the bottom of `js/app.js` with your email platform's embed (Mailchimp, ConvertKit, Kit, etc.).
-- **Links** — official links currently point to `drift2drivequiz.com` and `maxwellleadership.com`; add Chris's personal site / book retail links in the Connect section of `index.html`.
+- **Links** — the app links to `chrisrobinsonspeaker.com`, Chris's Maxwell Leadership speaker profile, and `drift2drivequiz.com`; add book retail links in the Connect section of `index.html` when available.
 
 ## File structure
 

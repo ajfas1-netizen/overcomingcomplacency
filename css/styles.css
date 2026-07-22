@@ -439,6 +439,22 @@ a { color: inherit; }
 .day-card.done h4::after { content: " ✓"; color: #7FD49B; }
 .day-card.done .dc-toggle { background: var(--green); border-color: var(--green); color: #fff; }
 
+/* ---------- Author ---------- */
+.author-wrap { display: grid; grid-template-columns: 1.4fr 1fr; gap: 2.5rem; align-items: center; }
+.author-text p { margin-bottom: 1rem; color: #C6C6CC; }
+.author-text p em { color: var(--gold); font-family: var(--font-quote); }
+.author-ctas { justify-content: flex-start; margin-top: 1.4rem; }
+.author-callout {
+  background: var(--navy-700); border-left: 4px solid var(--gold);
+  border-radius: var(--radius); padding: 1.8rem;
+  font-family: var(--font-quote); font-style: italic; font-size: 1.12rem; color: #EFE6D3;
+}
+.author-callout cite {
+  display: block; margin-top: 1rem; font-style: normal; font-family: var(--font-body);
+  font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; color: var(--gold);
+}
+@media (max-width: 820px) { .author-wrap { grid-template-columns: 1fr; } }
+
 /* ---------- Connect ---------- */
 .connect-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.1rem; margin-bottom: 2.4rem; }
 .connect-card {
