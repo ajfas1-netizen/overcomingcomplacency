@@ -1,0 +1,14 @@
+{
+  "name": "From Drift to Drive",
+  "short_name": "Drift to Drive",
+  "description": "The interactive companion to From Drift to Drive by Chris Robinson — diagnose your drift, work the Seven-Step Framework, and run the 30-Day Drive Challenge.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#131315",
+  "theme_color": "#131315",
+  "icons": [
+    { "src": "assets/icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
