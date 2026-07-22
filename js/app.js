@@ -1,5 +1,6 @@
 /* ============================================================
-   From Drift to Drive — Companion App logic
+   From Drift to Drive — Companion App logic (SPA)
+   Screens are hash-routed views (#/home, #/check, #/steps/3, …).
    All user data is stored locally in this browser (localStorage).
    ============================================================ */
 
@@ -15,6 +16,12 @@
     },
     set(key, val) {
       try { localStorage.setItem("dtd_" + key, JSON.stringify(val)); } catch (e) { /* private mode */ }
+    },
+    wipe() {
+      try {
+        Object.keys(localStorage).filter((k) => k.indexOf("dtd_") === 0)
+          .forEach((k) => localStorage.removeItem(k));
+      } catch (e) { /* ignore */ }
     }
   };
 
@@ -33,14 +40,49 @@
     note._t = setTimeout(() => { note.textContent = ""; }, 2500);
   }
 
-  /* ---------- Nav ---------- */
-  const navToggle = $("#navToggle"), navLinks = $("#navLinks");
-  navToggle.addEventListener("click", () => {
-    const open = navLinks.classList.toggle("open");
-    navToggle.setAttribute("aria-expanded", String(open));
-  });
-  navLinks.addEventListener("click", (e) => {
-    if (e.target.tagName === "A") navLinks.classList.remove("open");
+  /* ============================================================
+     ROUTER — click-in screens, back-button friendly
+     ============================================================ */
+  const VIEWS = ["home", "check", "steps", "challenge", "garage", "connect"];
+  let currentView = null;
+
+  function parseHash() {
+    const h = (location.hash || "").replace(/^#\/?/, "");
+    const parts = h.split("/").filter(Boolean);
+    return { view: VIEWS.includes(parts[0]) ? parts[0] : "home", arg: parts[1] };
+  }
+
+  function showView(name, arg) {
+    if (!VIEWS.includes(name)) name = "home";
+    VIEWS.forEach((v) => {
+      const el = $("#view-" + v);
+      const active = v === name;
+      if (active && el.hidden) {
+        el.hidden = false;
+        el.classList.remove("view-in");
+        void el.offsetWidth; /* restart animation */
+        el.classList.add("view-in");
+      } else if (!active) {
+        el.hidden = true;
+      }
+    });
+    $$("[data-view-link]").forEach((a) =>
+      a.classList.toggle("active", a.dataset.viewLink === name));
+    window.scrollTo({ top: 0, behavior: "auto" });
+    currentView = name;
+    // per-view refresh hooks
+    if (name === "garage") renderGarage();
+    if (name === "home") renderWelcome();
+    if (name === "challenge") renderChallenge();
+    if (name === "steps") {
+      const n = Number(arg);
+      renderStep(n >= 1 && n <= 7 ? n - 1 : activeStep);
+    }
+  }
+
+  window.addEventListener("hashchange", () => {
+    const { view, arg } = parseHash();
+    showView(view, arg);
   });
 
   /* ---------- Rotating quotes ---------- */
@@ -52,6 +94,23 @@
   }
   $("#quoteNext").addEventListener("click", () => { quoteIdx++; renderQuote(); });
   renderQuote();
+
+  /* ---------- Home welcome (returning-driver strip) ---------- */
+  function renderWelcome() {
+    const el = $("#homeWelcome");
+    const quiz = store.get("quizResult", null);
+    const done = store.get("challengeDone", []);
+    const lap = store.get("lap", 1);
+    const stepsDone = store.get("stepsDone", []);
+    if (!quiz && !done.length && !stepsDone.length) { el.innerHTML = ""; return; }
+    const bits = [];
+    if (quiz) bits.push("Drift score <strong>" + quiz.score + "/36</strong> (" + esc(quiz.label) + ")");
+    if (stepsDone.length) bits.push("Lap <strong>" + lap + "</strong> · <strong>" + stepsDone.length + "/7</strong> steps");
+    if (done.length) bits.push("<strong>" + done.length + "/30</strong> challenge days");
+    el.innerHTML =
+      '<div class="welcome-strip"><span>🏁 Welcome back, driver — ' + bits.join(" · ") + ".</span>" +
+      '<a class="btn btn-gold btn-sm" href="#/garage">Open My Garage</a></div>';
+  }
 
   /* ============================================================
      DRIFT CHECK
@@ -110,15 +169,14 @@
     $("#resultHeadline").textContent = zone.headline;
     $("#resultMessage").textContent = zone.message;
     $("#resultMoves").innerHTML = zone.moves.map((m) => "<li>" + esc(m) + "</li>").join("");
-    // pointer position along the 0–36 track
     requestAnimationFrame(() => {
       $("#gaugePointer").style.left = Math.max(2, Math.min(98, (score / 36) * 100)) + "%";
     });
+    const prev = store.get("quizResult", {});
     const result = {
       score, label: zone.label, date: new Date().toLocaleDateString(),
-      history: (store.get("quizResult", {}).history || [])
+      history: (prev.history || []).concat([{ score, date: new Date().toLocaleDateString() }]).slice(-12)
     };
-    result.history = result.history.concat([{ score, date: result.date }]).slice(-12);
     store.set("quizResult", result);
     showLastResult();
   }
@@ -129,20 +187,34 @@
   });
 
   /* ============================================================
-     FRAMEWORK — mile markers + step panel with tools
+     FRAMEWORK — mile markers, step tools, lap tracking
      ============================================================ */
   const mileTrack = $("#mileTrack");
   const stepPanel = $("#stepPanel");
   let activeStep = 0;
 
-  mileTrack.innerHTML = OC.steps.map((s, i) =>
-    '<button class="mile-marker" role="tab" data-i="' + i + '" aria-selected="false">' +
-    '<span class="mm-num">' + s.num + '</span>' +
-    '<span class="mm-name">' + esc(s.title) + "</span></button>").join("");
+  function renderLapBadge() {
+    const lap = store.get("lap", 1);
+    const done = store.get("stepsDone", []);
+    $("#lapBadge").innerHTML =
+      '<span class="lap-num">Lap ' + lap + "</span><span class=\"lap-count\">" + done.length + " / 7 steps</span>";
+  }
+
+  function renderMileTrack() {
+    const done = store.get("stepsDone", []);
+    mileTrack.innerHTML = OC.steps.map((s, i) =>
+      '<button class="mile-marker' + (done.includes(s.num) ? " done" : "") + '" role="tab" data-i="' + i + '" aria-selected="false">' +
+      '<span class="mm-num">' + (done.includes(s.num) ? "✓" : s.num) + '</span>' +
+      '<span class="mm-name">' + esc(s.title) + "</span></button>").join("");
+    $$(".mile-marker", mileTrack).forEach((m, j) => {
+      m.classList.toggle("active", j === activeStep);
+      m.setAttribute("aria-selected", String(j === activeStep));
+    });
+  }
 
   mileTrack.addEventListener("click", (e) => {
     const m = e.target.closest(".mile-marker");
-    if (m) renderStep(Number(m.dataset.i));
+    if (m) location.hash = "#/steps/" + (Number(m.dataset.i) + 1);
   });
 
   const toolRenderers = {
@@ -154,20 +226,46 @@
   function renderStep(i) {
     activeStep = i;
     const s = OC.steps[i];
-    $$(".mile-marker", mileTrack).forEach((m, j) => {
-      m.classList.toggle("active", j === i);
-      m.setAttribute("aria-selected", String(j === i));
-    });
+    const done = store.get("stepsDone", []);
+    const isDone = done.includes(s.num);
+    renderMileTrack();
+    renderLapBadge();
     stepPanel.innerHTML =
-      '<div class="step-head"><span class="step-no">0' + s.num + '</span><h3>' + esc(s.title) + "</h3></div>" +
+      '<div class="step-head"><span class="step-no">0' + s.num + '</span><h3>' + esc(s.title) + "</h3>" +
+      '<button class="step-done-btn' + (isDone ? " is-done" : "") + '" id="stepDoneBtn" type="button">' +
+      (isDone ? "✓ Step complete" : "Mark step complete") + "</button></div>" +
       '<p class="step-tagline">“' + esc(s.tagline) + '”</p>' +
       '<p class="step-summary">' + esc(s.summary) + "</p>" +
       '<div class="concept-grid">' + s.concepts.map((c) =>
         '<div class="concept-card"><h4>' + esc(c.name) + "</h4><p>" + esc(c.desc) + "</p></div>").join("") + "</div>" +
       '<div class="step-trap"><span aria-hidden="true">⚠️</span><span><strong>Where people run into the ditch:</strong> ' + esc(s.trap) + "</span></div>" +
       '<blockquote class="step-quote">“' + esc(s.quote.text) + '”<cite>— ' + esc(s.quote.by) + "</cite></blockquote>" +
-      '<div class="tool" id="stepTool"><h4>🔧 ' + esc(s.toolTitle) + "</h4><p>" + esc(s.toolIntro) + '</p><div id="toolBody"></div></div>';
+      '<div class="tool" id="stepTool"><h4>🔧 ' + esc(s.toolTitle) + "</h4><p>" + esc(s.toolIntro) + '</p><div id="toolBody"></div></div>' +
+      '<div class="step-nav">' +
+      (i > 0 ? '<a class="btn btn-ghost" href="#/steps/' + i + '">← Step ' + i + ": " + esc(OC.steps[i - 1].title) + "</a>" : "<span></span>") +
+      (i < 6 ? '<a class="btn btn-gold" href="#/steps/' + (i + 2) + '">Step ' + (i + 2) + ": " + esc(OC.steps[i + 1].title) + " →</a>"
+             : '<a class="btn btn-gold" href="#/garage">Finish the lap in My Garage →</a>') +
+      "</div>";
+    $("#stepDoneBtn").addEventListener("click", () => toggleStepDone(s.num));
     toolRenderers[s.id]($("#toolBody"));
+  }
+
+  function toggleStepDone(num) {
+    let done = store.get("stepsDone", []);
+    done = done.includes(num) ? done.filter((n) => n !== num) : done.concat([num]);
+    if (done.length === 7) {
+      // Lap complete — the framework runs on a loop
+      const lap = store.get("lap", 1);
+      store.set("lap", lap + 1);
+      store.set("stepsDone", []);
+      renderStep(activeStep);
+      stepPanel.insertAdjacentHTML("afterbegin",
+        '<div class="lap-complete">🏁 <strong>Lap ' + lap + " complete!</strong> All seven steps run on a loop — " +
+        "retake the Drift Check, sharpen your clarity, and drive lap " + (lap + 1) + ".</div>");
+      return;
+    }
+    store.set("stepsDone", done);
+    renderStep(activeStep);
   }
 
   /* ----- Tool 1: I-Exam Chart ----- */
@@ -246,20 +344,20 @@
   }
 
   /* ----- Tool 3: Today's Index Card ----- */
+  const CARD_QS = [
+    "What do I need to read today?",
+    "What do I need to listen to today?",
+    "Who do I need to call today?",
+    "What do I need to do today?",
+    "What am I looking for today?"
+  ];
   function toolFiltering(el) {
-    const qs = [
-      "What do I need to read today?",
-      "What do I need to listen to today?",
-      "Who do I need to call today?",
-      "What do I need to do today?",
-      "What am I looking for today?"
-    ];
     const today = new Date().toDateString();
     const cards = store.get("indexcards", []);
     const todays = cards.find((c) => c.date === today) || { answers: ["", "", "", "", ""] };
     el.innerHTML =
       '<div class="indexcard">' +
-      qs.map((q, i) =>
+      CARD_QS.map((q, i) =>
         '<label for="icQ' + i + '">' + (i + 1) + ". " + esc(q) + "</label>" +
         '<input type="text" id="icQ' + i + '" value="' + esc(todays.answers[i]) + '" />').join("") +
       "</div>" +
@@ -273,7 +371,7 @@
         : "Your card stack is empty — write today's card.";
     }
     $("#icSave", el).addEventListener("click", (e) => {
-      const answers = qs.map((_, i) => $("#icQ" + i, el).value.trim());
+      const answers = CARD_QS.map((_, i) => $("#icQ" + i, el).value.trim());
       const all = store.get("indexcards", []).filter((c) => c.date !== today);
       all.push({ date: today, answers });
       store.set("indexcards", all.slice(-60));
@@ -432,10 +530,8 @@
     render();
   }
 
-  renderStep(0);
-
   /* ============================================================
-     30-DAY DRIVE CHALLENGE
+     30-DAY DRIVE CHALLENGE (with streaks)
      ============================================================ */
   const phases = OC.challengePhases;
   const phaseFor = (day) => phases.find((p) => day >= p.days[0] && day <= p.days[1]);
@@ -444,30 +540,108 @@
     '<span><span class="phase-dot" style="background:' + p.color + '"></span>' +
     esc(p.name) + " · Days " + p.days[0] + "–" + p.days[1] + "</span>").join("");
 
-  const grid = $("#challengeGrid");
-  grid.innerHTML = OC.challenge.map((d) => {
+  let selectedDay = null; // which mile marker the focus card shows
+
+  function dayKey(date) {
+    return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
+  }
+
+  function computeStreak() {
+    const dates = store.get("challengeDates", {});
+    const daySet = new Set(Object.values(dates));
+    if (!daySet.size) return 0;
+    let streak = 0;
+    const cursor = new Date();
+    // streak may start today or yesterday
+    if (!daySet.has(dayKey(cursor))) cursor.setDate(cursor.getDate() - 1);
+    while (daySet.has(dayKey(cursor))) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return streak;
+  }
+
+  function firstOpenDay(done) {
+    const next = OC.challenge.find((d) => !done.includes(d.day));
+    return next ? next.day : 30;
+  }
+
+  function renderHighway() {
+    const done = store.get("challengeDone", []);
+    const current = firstOpenDay(done);
+    $("#highway").innerHTML = OC.challenge.map((d) => {
+      const p = phaseFor(d.day);
+      const isDone = done.includes(d.day);
+      const isCurrent = d.day === current && done.length < 30;
+      const isSel = d.day === selectedDay;
+      return '<button type="button" class="mile' +
+        (isDone ? " done" : "") + (isCurrent ? " current" : "") + (isSel ? " selected" : "") +
+        '" data-day="' + d.day + '" style="--phase:' + p.color + '" ' +
+        'aria-label="Day ' + d.day + ": " + esc(d.title) + (isDone ? " (complete)" : "") + '">' +
+        (isCurrent ? '<span class="mile-car" aria-hidden="true">🏎️</span>' : "") +
+        '<span class="mile-dot">' + (isDone ? "✓" : d.day) + "</span>" +
+        "</button>";
+    }).join("");
+    // keep the selected marker centered — scroll only the road, never the page
+    const hw = $("#highway");
+    const sel = $(".mile.selected", hw);
+    if (sel) {
+      hw.scrollTo({
+        left: sel.offsetLeft - hw.clientWidth / 2 + sel.offsetWidth / 2,
+        behavior: "smooth"
+      });
+    }
+  }
+
+  function renderFocus() {
+    const done = store.get("challengeDone", []);
+    const d = OC.challenge[selectedDay - 1];
     const p = phaseFor(d.day);
-    return '<div class="day-card" data-day="' + d.day + '" style="border-top-color:' + p.color + '" tabindex="0" role="button" aria-expanded="false">' +
-      '<span class="dc-day">Day ' + d.day + " · " + esc(p.name) + "</span>" +
-      "<h4>" + esc(d.title) + "</h4>" +
-      '<p class="dc-task">' + esc(d.task) + "</p>" +
-      '<p class="dc-anchor">“' + esc(d.anchor) + '”</p>' +
-      '<button class="dc-toggle" type="button"></button></div>';
-  }).join("");
+    const isDone = done.includes(d.day);
+    $("#dayFocus").innerHTML =
+      '<div class="df-side" style="--phase:' + p.color + '">' +
+      '<span class="df-daynum">' + d.day + "</span><span class=\"df-of\">of 30</span>" +
+      '<span class="df-phase">' + esc(p.name) + "</span></div>" +
+      '<div class="df-main">' +
+      "<h3>" + esc(d.title) + "</h3>" +
+      '<p class="df-task">' + esc(d.task) + "</p>" +
+      '<p class="df-anchor">“' + esc(d.anchor) + '”</p>' +
+      '<div class="df-actions">' +
+      '<button type="button" class="df-arrow" id="dfPrev"' + (d.day === 1 ? " disabled" : "") + '>‹</button>' +
+      '<button type="button" class="btn ' + (isDone ? "btn-ghost df-undo" : "btn-gold") + '" id="dfComplete">' +
+      (isDone ? "✓ Done — tap to undo" : "Complete day " + d.day + " & drive on") + "</button>" +
+      '<button type="button" class="df-arrow" id="dfNext"' + (d.day === 30 ? " disabled" : "") + '>›</button>' +
+      "</div></div>";
+    $("#dfPrev").addEventListener("click", () => { selectedDay = Math.max(1, selectedDay - 1); renderChallenge(); });
+    $("#dfNext").addEventListener("click", () => { selectedDay = Math.min(30, selectedDay + 1); renderChallenge(); });
+    $("#dfComplete").addEventListener("click", () => {
+      let doneNow = store.get("challengeDone", []);
+      const dates = store.get("challengeDates", {});
+      if (doneNow.includes(d.day)) {
+        doneNow = doneNow.filter((x) => x !== d.day);
+        delete dates[d.day];
+      } else {
+        doneNow = doneNow.concat([d.day]);
+        dates[d.day] = dayKey(new Date());
+        selectedDay = firstOpenDay(doneNow); // roll forward to the next open day
+      }
+      store.set("challengeDone", doneNow);
+      store.set("challengeDates", dates);
+      renderChallenge();
+    });
+  }
 
   function renderChallenge() {
     const done = store.get("challengeDone", []);
-    $$(".day-card", grid).forEach((card) => {
-      const day = Number(card.dataset.day);
-      const isDone = done.includes(day);
-      card.classList.toggle("done", isDone);
-      $(".dc-toggle", card).textContent = isDone ? "✓ Done — tap to undo" : "Mark day " + day + " complete";
-    });
+    if (selectedDay == null) selectedDay = firstOpenDay(done);
     const pct = Math.round((done.length / 30) * 100);
     $("#challengeBarFill").style.width = pct + "%";
     $("#challengeStats").textContent = done.length + " of 30 days complete (" + pct + "%)" +
       (done.length === 30 ? " — lap one complete! Start lap two 🏁" : "");
-    // "up next" card
+    const streak = computeStreak();
+    $("#challengeStreak").textContent = streak >= 2
+      ? "🔥 " + streak + "-day streak — be consistent every day that ends with day."
+      : "Complete a day two days running to light your streak. 🔥";
     const next = OC.challenge.find((d) => !done.includes(d.day));
     const todayEl = $("#challengeToday");
     if (next) {
@@ -477,40 +651,144 @@
       todayEl.innerHTML = '<span class="ct-kicker">🏁 Lap complete</span>' +
         "<h3>All 30 days done.</h3><p>The framework runs on a loop — retake the Drift Check and start lap two.</p>";
     }
+    renderHighway();
+    renderFocus();
   }
 
-  grid.addEventListener("click", (e) => {
-    const toggle = e.target.closest(".dc-toggle");
-    const card = e.target.closest(".day-card");
-    if (!card) return;
-    const day = Number(card.dataset.day);
-    if (toggle) {
-      let done = store.get("challengeDone", []);
-      done = done.includes(day) ? done.filter((d) => d !== day) : done.concat([day]);
-      store.set("challengeDone", done);
-      renderChallenge();
-    } else {
-      const open = card.classList.toggle("open");
-      card.setAttribute("aria-expanded", String(open));
-    }
-  });
-  grid.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      const card = e.target.closest(".day-card");
-      if (card && e.target === card) {
-        e.preventDefault();
-        card.classList.toggle("open");
-      }
-    }
+  $("#highway").addEventListener("click", (e) => {
+    const m = e.target.closest(".mile");
+    if (!m) return;
+    selectedDay = Number(m.dataset.day);
+    renderChallenge();
   });
 
   $("#challengeReset").addEventListener("click", () => {
     if (confirm("Reset all 30-day challenge progress?")) {
       store.set("challengeDone", []);
+      store.set("challengeDates", {});
+      selectedDay = null;
       renderChallenge();
     }
   });
-  renderChallenge();
+
+  /* ============================================================
+     MY GARAGE — the cockpit
+     ============================================================ */
+  function garageCard(opts) {
+    return '<div class="garage-card' + (opts.wide ? " wide" : "") + '">' +
+      '<div class="gc-head"><span class="gc-icon" aria-hidden="true">' + opts.icon + "</span><h3>" + esc(opts.title) + "</h3>" +
+      (opts.link ? '<a class="gc-link" href="' + opts.link + '">' + esc(opts.linkText || "Open →") + "</a>" : "") +
+      "</div>" + opts.body + "</div>";
+  }
+
+  function renderGarage() {
+    const g = $("#garageGrid");
+    const quiz = store.get("quizResult", null);
+    const iexam = store.get("iexam", null);
+    const bvacc = store.get("bvacc", []);
+    const cards = store.get("indexcards", []);
+    const done = store.get("challengeDone", []);
+    const lap = store.get("lap", 1);
+    const stepsDone = store.get("stepsDone", []);
+    const nextStep = store.get("nextStep", "");
+    const calc = store.get("calc", null);
+    const debriefs = store.get("debriefs", []);
+    const mentors = store.get("mentors", []);
+    const streak = computeStreak();
+    const today = new Date().toDateString();
+    const todayCard = cards.find((c) => c.date === today);
+
+    let html = "";
+
+    // Drift score + trend
+    if (quiz) {
+      const hist = quiz.history || [];
+      const prev = hist.length > 1 ? hist[hist.length - 2].score : null;
+      const delta = prev == null ? "" :
+        (quiz.score < prev ? '<span class="delta good">▼ ' + (prev - quiz.score) + " vs last check — driving!</span>"
+          : quiz.score > prev ? '<span class="delta bad">▲ ' + (quiz.score - prev) + " vs last check — hear the rumble strip</span>"
+            : '<span class="delta">— unchanged vs last check</span>');
+      html += garageCard({
+        icon: "◎", title: "Drift score", link: "#/check", linkText: "Retake →",
+        body: '<p class="gc-big">' + quiz.score + '<span class="gc-sub">/36</span></p>' +
+          '<p class="gc-label">' + esc(quiz.label) + " · " + esc(quiz.date) + "</p>" + delta
+      });
+    } else {
+      html += garageCard({
+        icon: "◎", title: "Drift score", link: "#/check", linkText: "Start →",
+        body: '<p class="gc-empty">No reading yet. Two minutes of honesty — that\'s your baseline.</p>'
+      });
+    }
+
+    // Lap / steps
+    html += garageCard({
+      icon: "➊", title: "Framework lap", link: "#/steps",
+      body: '<p class="gc-big">' + stepsDone.length + '<span class="gc-sub">/7 steps</span></p>' +
+        '<p class="gc-label">Lap ' + lap + " — the steps build on each other; work them in order.</p>" +
+        '<div class="gc-bar"><div style="width:' + Math.round((stepsDone.length / 7) * 100) + '%"></div></div>'
+    });
+
+    // Challenge
+    html += garageCard({
+      icon: "▦", title: "30-Day Challenge", link: "#/challenge",
+      body: '<p class="gc-big">' + done.length + '<span class="gc-sub">/30 days</span></p>' +
+        '<p class="gc-label">' + (streak >= 2 ? "🔥 " + streak + "-day streak" : "Light your streak with back-to-back days") + "</p>" +
+        '<div class="gc-bar"><div style="width:' + Math.round((done.length / 30) * 100) + '%"></div></div>'
+    });
+
+    // Vision
+    html += garageCard({
+      icon: "👁", title: "My vision (I-Exam)", link: "#/steps/1", wide: true,
+      body: (iexam && iexam.vision)
+        ? '<p class="gc-vision">' + esc(iexam.vision) + "</p>" +
+          '<p class="gc-label">' + (iexam.rows || []).filter((r) => r && r.trim()).length + " “I will…” lines beneath it</p>"
+        : '<p class="gc-empty">You cannot have what you cannot see. Put your big letter at the top of the chart.</p>'
+    });
+
+    // Next easiest step
+    html += garageCard({
+      icon: "⚡", title: "Next easiest step", link: "#/steps/6", wide: true,
+      body: nextStep
+        ? '<p class="gc-vision">' + esc(nextStep) + "</p>" +
+          '<p class="gc-label">' + (calc && calc.goal ? "Toward: " + esc(calc.goal) : "To multiply your actions, first divide.") + "</p>"
+        : '<p class="gc-empty">Divide your big number down to one human-sized step, then write it here.</p>'
+    });
+
+    // Today's card
+    html += garageCard({
+      icon: "🗂", title: "Today's index card", link: "#/steps/3",
+      body: todayCard
+        ? '<p class="gc-label">✓ Written for today — ' + todayCard.answers.filter((a) => a).length + " of 5 answered. Now live it.</p>"
+        : '<p class="gc-empty">Five questions. One card. Tasks will try to hijack your day — don\'t let them.</p>'
+    });
+
+    // Gathering
+    html += garageCard({
+      icon: "📚", title: "Gathering (BVACC)", link: "#/steps/2",
+      body: '<p class="gc-big">' + bvacc.length + '<span class="gc-sub">/10</span></p>' +
+        '<p class="gc-label">' + (bvacc.length >= 10 ? "Enough — move to Filtering." : "Resources gathered toward your vision") + "</p>"
+    });
+
+    // Debriefs & mentors
+    html += garageCard({
+      icon: "🔁", title: "Evaluation loop", link: "#/steps/7",
+      body: '<p class="gc-big">' + debriefs.length + '<span class="gc-sub"> debrief' + (debriefs.length === 1 ? "" : "s") + "</span></p>" +
+        '<p class="gc-label">' + (mentors.length ? mentors.length + " mentor" + (mentors.length === 1 ? "" : "s") + " vetted · " : "") +
+        "Act → evaluate → adjust → act again.</p>"
+    });
+
+    g.innerHTML = html;
+  }
+
+  $("#garageWipe").addEventListener("click", () => {
+    if (confirm("Clear ALL saved data — scores, charts, cards, and challenge progress? This can't be undone.")) {
+      store.wipe();
+      selectedDay = null;
+      renderGarage();
+      renderChallenge();
+      renderWelcome();
+    }
+  });
 
   /* ---------- Signup ----------
      DEMO ONLY: stores locally and shows a success state. Replace this
@@ -524,4 +802,8 @@
     $("#signupNote").textContent =
       "Welcome aboard — watch your inbox for new tools, challenge cohorts, and dates from Chris.";
   });
+
+  /* ---------- boot ---------- */
+  const boot = parseHash();
+  showView(boot.view, boot.arg);
 })();

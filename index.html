@@ -4,89 +4,102 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>From Drift to Drive — Companion App | Chris Robinson</title>
-<meta name="description" content="The interactive companion to From Drift to Drive by Chris Robinson (Maxwell Leadership). Take the Drift Check, work the Seven-Step Framework, and run the 30-Day Drive Challenge." />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230B1F3A'/%3E%3Cpath d='M32 8 L44 56 H38 L32 32 L26 56 H20 Z' fill='%23F2B01E'/%3E%3C/svg%3E" />
+<meta name="description" content="The interactive companion to From Drift to Drive by Chris Robinson (Maxwell Leadership). Take the Drift Check, work the Seven-Step Framework, run the 30-Day Drive Challenge, and track it all in your Garage." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231D1D20'/%3E%3Cpath d='M32 8 L44 56 H38 L32 32 L26 56 H20 Z' fill='%23D2AC5F'/%3E%3C/svg%3E" />
 <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
 
-<!-- ============ NAV ============ -->
-<header class="nav" id="top">
-  <a class="nav-brand" href="#top">
+<!-- ============ APP NAV ============ -->
+<header class="nav">
+  <a class="nav-brand" href="#/home" data-view-link="home">
     <span class="nav-badge">D→D</span>
     <span class="nav-title">From Drift <em>to</em> Drive</span>
   </a>
-  <nav class="nav-links" id="navLinks">
-    <a href="#driftcheck">Drift Check</a>
-    <a href="#framework">The 7 Steps</a>
-    <a href="#challenge">30-Day Challenge</a>
-    <a href="#author">Meet Chris</a>
-    <a href="#connect">Connect</a>
+  <nav class="nav-links" id="navLinks" aria-label="App screens">
+    <a href="#/home" data-view-link="home"><span class="nl-icon" aria-hidden="true">⌂</span><span>Home</span></a>
+    <a href="#/check" data-view-link="check"><span class="nl-icon" aria-hidden="true">◎</span><span>Drift Check</span></a>
+    <a href="#/steps" data-view-link="steps"><span class="nl-icon" aria-hidden="true">➊</span><span>7 Steps</span></a>
+    <a href="#/challenge" data-view-link="challenge"><span class="nl-icon" aria-hidden="true">▦</span><span>Challenge</span></a>
+    <a href="#/garage" data-view-link="garage"><span class="nl-icon" aria-hidden="true">⚑</span><span>My Garage</span></a>
+    <a href="#/connect" data-view-link="connect"><span class="nl-icon" aria-hidden="true">✦</span><span>Connect</span></a>
   </nav>
-  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
 </header>
 
-<!-- ============ HERO ============ -->
-<section class="hero">
-  <div class="hero-inner">
-    <p class="hero-kicker">The interactive companion to the book by Chris Robinson · Foreword by John C. Maxwell</p>
-    <h1 class="hero-title">From <span class="drift">Drift</span><br/>to <span class="drive">Drive</span></h1>
-    <p class="hero-sub">A high achiever's guide to breaking the chains of complacency — <em>that secret place of satisfactory success.</em></p>
-    <div class="hero-ctas">
-      <a class="btn btn-gold" href="#driftcheck">Take the Drift Check</a>
-      <a class="btn btn-ghost" href="#framework">Explore the 7 Steps</a>
-    </div>
-  </div>
-  <div class="hero-road" aria-hidden="true">
-    <div class="road">
-      <div class="road-line"></div>
-    </div>
-  </div>
-</section>
+<main id="app">
 
-<!-- rumble strip divider + rotating quote -->
-<div class="rumble" aria-hidden="true"></div>
-<section class="quotebar">
-  <blockquote id="quoteText"></blockquote>
-  <cite id="quoteBy"></cite>
-  <button class="quote-next" id="quoteNext" aria-label="Next quote">↻</button>
-</section>
-<div class="rumble" aria-hidden="true"></div>
-
-<!-- ============ WHY / WAKE-UP ============ -->
-<section class="section section-paper" id="why">
-  <div class="wrap">
-    <p class="eyebrow">The wake-up</p>
-    <h2>Complacency isn't laziness.<br/>It's drowsiness at the wheel.</h2>
-    <div class="cols">
-      <p>Your calendar is full. The emails get answered. The checklist gets checked. But somewhere along a familiar road, the achiever slips into autopilot — relying on the same old methods to do the same old things, assuming the same old results. Rome did it. Richard Petty did it. Kodak, Blockbuster, and Pan&nbsp;Am did it. Historians even have a name for it: <strong>victory disease</strong>.</p>
-      <p>In the 1940s, engineers cut gashes into a New Jersey highway because drivers kept drifting into oncoming traffic. Those <strong>rumble strips</strong> now prevent 70% of drift accidents — a little sound along a familiar road that wakes the driver up. That's what this app is for: a rumble strip for your potential. Evaluate where you are, work the seven steps, and pull yourself back into the center lane of your purpose.</p>
+<!-- ============ VIEW: HOME ============ -->
+<section class="view" id="view-home" hidden>
+  <div class="hero">
+    <div class="hero-inner">
+      <p class="hero-kicker">The interactive companion to the book by Chris Robinson · Foreword by John C. Maxwell</p>
+      <h1 class="hero-title">From <span class="drift">Drift</span><br/>to <span class="drive">Drive</span></h1>
+      <p class="hero-sub">A high achiever's guide to breaking the chains of complacency — <em>that secret place of satisfactory success.</em></p>
+      <div class="hero-ctas">
+        <a class="btn btn-gold" href="#/check">Take the Drift Check</a>
+        <a class="btn btn-ghost" href="#/steps">Work the 7 Steps</a>
+      </div>
     </div>
+    <div class="hero-road" aria-hidden="true"><div class="road"><div class="road-line"></div></div></div>
+  </div>
+
+  <div class="rumble" aria-hidden="true"></div>
+
+  <div class="wrap home-body">
+    <div class="home-welcome" id="homeWelcome"></div>
+
+    <h2 class="home-h2">Your three lanes</h2>
+    <div class="lane-cards">
+      <a class="lane-card" href="#/check">
+        <span class="lane-num">01</span>
+        <h3>Diagnose the drift</h3>
+        <p>Twelve honest questions reveal whether you're in the driver's seat, on cruise control, or drifting onto the shoulder.</p>
+        <span class="lane-go">Take the Drift Check →</span>
+      </a>
+      <a class="lane-card" href="#/steps">
+        <span class="lane-num">02</span>
+        <h3>Work the framework</h3>
+        <p>Seven steps, each with a working tool — from the I-Exam Chart to the Four-Question Debrief. Not theory. Reps.</p>
+        <span class="lane-go">Open the 7 Steps →</span>
+      </a>
+      <a class="lane-card" href="#/challenge">
+        <span class="lane-num">03</span>
+        <h3>Build the momentum</h3>
+        <p>One small action a day for 30 days — a full lap through the framework with streaks and progress you can see.</p>
+        <span class="lane-go">Start the Challenge →</span>
+      </a>
+    </div>
+
+    <h2 class="home-h2">Why this matters</h2>
     <div class="stat-row">
       <div class="stat-tile"><span class="stat-num">60%</span><span class="stat-label">of employees report feeling disengaged at work</span></div>
       <div class="stat-tile"><span class="stat-num">$7.8T</span><span class="stat-label">the annual price tag of that disengagement</span></div>
       <div class="stat-tile"><span class="stat-num">70%</span><span class="stat-label">of drift accidents prevented by a simple rumble strip</span></div>
       <div class="stat-tile"><span class="stat-num">8%</span><span class="stat-label">of people reach their goals — the framework puts you there</span></div>
     </div>
+
+    <div class="quotebar home-quote">
+      <blockquote id="quoteText"></blockquote>
+      <cite id="quoteBy"></cite>
+      <button class="quote-next" id="quoteNext" aria-label="Next quote">↻</button>
+    </div>
   </div>
 </section>
 
-<!-- ============ DRIFT CHECK ============ -->
-<section class="section section-navy" id="driftcheck">
+<!-- ============ VIEW: DRIFT CHECK ============ -->
+<section class="view view-dark" id="view-check" hidden>
   <div class="wrap">
     <p class="eyebrow gold">Self-assessment</p>
     <h2>The Drift Check</h2>
     <p class="lead" id="quizIntro"></p>
 
     <div class="quiz-shell" id="quizShell">
-      <!-- start state -->
       <div class="quiz-start" id="quizStart">
         <p>Twelve honest questions. About two minutes. No wrong answers — only true ones.</p>
         <button class="btn btn-gold" id="quizBegin">Start the Drift Check</button>
         <p class="quiz-note" id="quizLastResult"></p>
       </div>
 
-      <!-- question state -->
       <div class="quiz-q hidden" id="quizQ">
         <div class="quiz-progress"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
         <p class="quiz-count" id="quizCount"></p>
@@ -94,7 +107,6 @@
         <div class="quiz-options" id="quizOptions"></div>
       </div>
 
-      <!-- result state -->
       <div class="quiz-result hidden" id="quizResult">
         <p class="quiz-count">Your result</p>
         <div class="gauge">
@@ -114,8 +126,8 @@
           <ol id="resultMoves"></ol>
         </div>
         <div class="hero-ctas">
-          <a class="btn btn-gold" href="#framework">Start Step 1: Clarity</a>
-          <a class="btn btn-ghost" href="https://drift2drivequiz.com" target="_blank" rel="noopener">Take Chris's full assessment →</a>
+          <a class="btn btn-gold" href="#/steps">Start Step 1: Clarity</a>
+          <a class="btn btn-ghost" href="https://drift2drivequiz.com" target="_blank" rel="noopener">Chris's full assessment →</a>
           <button class="btn btn-ghost" id="quizRetake">Retake</button>
         </div>
       </div>
@@ -124,27 +136,25 @@
   </div>
 </section>
 
-<div class="rumble" aria-hidden="true"></div>
-
-<!-- ============ FRAMEWORK ============ -->
-<section class="section section-paper" id="framework">
+<!-- ============ VIEW: 7 STEPS ============ -->
+<section class="view view-paper" id="view-steps" hidden>
   <div class="wrap">
-    <p class="eyebrow">The roadmap</p>
-    <h2>The Seven-Step Framework</h2>
-    <p class="lead">Seven steps to replace complacency with vitality, purpose, and momentum. They build on each other — work them in order, and when you finish, loop back to Step 1. That's how you cut the head off the complacency monster, one lap at a time.</p>
+    <div class="steps-header">
+      <div>
+        <p class="eyebrow">The roadmap</p>
+        <h2>The Seven-Step Framework</h2>
+      </div>
+      <div class="lap-badge" id="lapBadge"></div>
+    </div>
+    <p class="lead">Seven steps that build on each other — work them in order, and when you finish, loop back to Step 1. That's how you cut the head off the complacency monster, one lap at a time.</p>
 
-    <!-- mile-marker selector -->
     <div class="mile-track" id="mileTrack" role="tablist" aria-label="Framework steps"></div>
-
-    <!-- step detail -->
     <article class="step-panel" id="stepPanel"></article>
   </div>
 </section>
 
-<div class="rumble" aria-hidden="true"></div>
-
-<!-- ============ 30-DAY CHALLENGE ============ -->
-<section class="section section-navy" id="challenge">
+<!-- ============ VIEW: CHALLENGE ============ -->
+<section class="view view-dark" id="view-challenge" hidden>
   <div class="wrap">
     <p class="eyebrow gold">Daily momentum</p>
     <h2>The 30-Day Drive Challenge</h2>
@@ -154,45 +164,54 @@
       <div class="challenge-progress">
         <div class="challenge-bar"><div class="challenge-bar-fill" id="challengeBarFill"></div></div>
         <p id="challengeStats">0 of 30 days complete</p>
+        <p class="streak-line" id="challengeStreak"></p>
       </div>
       <div class="challenge-today" id="challengeToday"></div>
     </div>
 
+    <div class="highway-wrap" aria-label="Your 30-day highway">
+      <div class="highway" id="highway"></div>
+    </div>
     <div class="phase-legend" id="phaseLegend"></div>
-    <div class="challenge-grid" id="challengeGrid"></div>
+    <article class="day-focus" id="dayFocus" aria-live="polite"></article>
     <p class="fineprint"><button class="linklike" id="challengeReset">Reset my challenge progress</button></p>
   </div>
 </section>
 
-<div class="rumble" aria-hidden="true"></div>
-
-<!-- ============ ABOUT CHRIS ============ -->
-<section class="section section-navy" id="author">
-  <div class="wrap author-wrap">
-    <div class="author-text">
-      <p class="eyebrow gold">Meet the author</p>
-      <h2>Chris Robinson</h2>
-      <p class="lead">Executive Vice President of Maxwell Leadership and one of the first members of the Maxwell Leadership Certified Team, Chris has coached and spoken to high-capacity leaders across the globe — from Orlando to Cambodia to Indonesia.</p>
-      <p>His own road runs through a foreclosure notice, a courtroom, and five words that became a battle cry against complacency: <em>“I can build this again.”</em> As John C. Maxwell writes in the foreword: <em>“Through it all, I've seen one defining characteristic in him. He refuses to let complacency win.”</em></p>
-      <div class="hero-ctas author-ctas">
-        <a class="btn btn-gold" href="https://www.chrisrobinsonspeaker.com" target="_blank" rel="noopener">Book Chris to speak</a>
-        <a class="btn btn-ghost" href="https://www.maxwellleadership.com/speaker/chris-robinson/" target="_blank" rel="noopener">Maxwell Leadership profile</a>
-      </div>
-    </div>
-    <blockquote class="author-callout">
-      <p>“There are two kinds of people in the world: those who drift through life and those who take ownership of their journey. The difference isn't talent, intelligence, or luck. It's a decision.”</p>
-      <cite>— John C. Maxwell, from the foreword</cite>
-    </blockquote>
+<!-- ============ VIEW: MY GARAGE ============ -->
+<section class="view view-dark" id="view-garage" hidden>
+  <div class="wrap">
+    <p class="eyebrow gold">Your cockpit</p>
+    <h2>My Garage</h2>
+    <p class="lead">Everything you've built in one place — your score, your vision, your momentum. You can't expect what you won't inspect.</p>
+    <div class="garage-grid" id="garageGrid"></div>
+    <p class="fineprint">All of this lives privately in your browser. <button class="linklike" id="garageWipe">Clear all my data</button></p>
   </div>
 </section>
 
-<div class="rumble" aria-hidden="true"></div>
+<!-- ============ VIEW: CONNECT ============ -->
+<section class="view view-paper" id="view-connect" hidden>
+  <div class="author-band">
+    <div class="wrap author-wrap">
+      <div class="author-text">
+        <p class="eyebrow gold">Meet the author</p>
+        <h2>Chris Robinson</h2>
+        <p class="lead">Executive Vice President of Maxwell Leadership and one of the first members of the Maxwell Leadership Certified Team, Chris has coached and spoken to high-capacity leaders across the globe — from Orlando to Cambodia to Indonesia.</p>
+        <p>His own road runs through a foreclosure notice, a courtroom, and five words that became a battle cry against complacency: <em>“I can build this again.”</em> As John C. Maxwell writes in the foreword: <em>“Through it all, I've seen one defining characteristic in him. He refuses to let complacency win.”</em></p>
+        <div class="hero-ctas author-ctas">
+          <a class="btn btn-gold" href="https://www.chrisrobinsonspeaker.com" target="_blank" rel="noopener">Book Chris to speak</a>
+          <a class="btn btn-ghost btn-ghost-dark" href="https://www.maxwellleadership.com/speaker/chris-robinson/" target="_blank" rel="noopener">Maxwell Leadership profile</a>
+        </div>
+      </div>
+      <blockquote class="author-callout">
+        <p>“There are two kinds of people in the world: those who drift through life and those who take ownership of their journey. The difference isn't talent, intelligence, or luck. It's a decision.”</p>
+        <cite>— John C. Maxwell, from the foreword</cite>
+      </blockquote>
+    </div>
+  </div>
 
-<!-- ============ CONNECT ============ -->
-<section class="section section-paper" id="connect">
-  <div class="wrap">
-    <p class="eyebrow">Stay in the drive</p>
-    <h2>Keep your hands on the wheel</h2>
+  <div class="wrap connect-body">
+    <h2 class="home-h2">Keep your hands on the wheel</h2>
     <div class="connect-cards">
       <a class="connect-card" href="https://www.chrisrobinsonspeaker.com/about" target="_blank" rel="noopener">
         <h3>🎤 Chris Robinson, Speaker</h3>
@@ -230,6 +249,8 @@
     </div>
   </div>
 </section>
+
+</main>
 
 <footer class="footer">
   <div class="road-line-footer" aria-hidden="true"></div>
