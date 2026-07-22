@@ -13,16 +13,16 @@
 <!-- ============ APP NAV ============ -->
 <header class="nav">
   <a class="nav-brand" href="#/home" data-view-link="home">
-    <span class="nav-badge">D→D</span>
+    <span class="nav-badge">D<i>·</i>D</span>
     <span class="nav-title">From Drift <em>to</em> Drive</span>
   </a>
   <nav class="nav-links" id="navLinks" aria-label="App screens">
-    <a href="#/home" data-view-link="home"><span class="nl-icon" aria-hidden="true">⌂</span><span>Home</span></a>
-    <a href="#/check" data-view-link="check"><span class="nl-icon" aria-hidden="true">◎</span><span>Drift Check</span></a>
-    <a href="#/steps" data-view-link="steps"><span class="nl-icon" aria-hidden="true">➊</span><span>7 Steps</span></a>
-    <a href="#/challenge" data-view-link="challenge"><span class="nl-icon" aria-hidden="true">▦</span><span>Challenge</span></a>
-    <a href="#/garage" data-view-link="garage"><span class="nl-icon" aria-hidden="true">⚑</span><span>My Garage</span></a>
-    <a href="#/connect" data-view-link="connect"><span class="nl-icon" aria-hidden="true">✦</span><span>Connect</span></a>
+    <a href="#/home" data-view-link="home"><span class="nl-icon" data-icon="home" aria-hidden="true"></span><span>Home</span></a>
+    <a href="#/check" data-view-link="check"><span class="nl-icon" data-icon="gauge" aria-hidden="true"></span><span>Drift Check</span></a>
+    <a href="#/steps" data-view-link="steps"><span class="nl-icon" data-icon="road" aria-hidden="true"></span><span>7 Steps</span></a>
+    <a href="#/challenge" data-view-link="challenge"><span class="nl-icon" data-icon="flag" aria-hidden="true"></span><span>Challenge</span></a>
+    <a href="#/garage" data-view-link="garage"><span class="nl-icon" data-icon="garage" aria-hidden="true"></span><span>My Garage</span></a>
+    <a href="#/connect" data-view-link="connect"><span class="nl-icon" data-icon="spark" aria-hidden="true"></span><span>Connect</span></a>
   </nav>
 </header>
 
@@ -214,22 +214,22 @@
     <h2 class="home-h2">Keep your hands on the wheel</h2>
     <div class="connect-cards">
       <a class="connect-card" href="https://www.chrisrobinsonspeaker.com/about" target="_blank" rel="noopener">
-        <h3>🎤 Chris Robinson, Speaker</h3>
+        <h3><span class="cc-icon" data-icon="mic" aria-hidden="true"></span>Chris Robinson, Speaker</h3>
         <p>Keynotes, coaching, and training from the author — bring the drift-to-drive message to your team, stage, or event.</p>
         <span class="connect-go">chrisrobinsonspeaker.com →</span>
       </a>
       <a class="connect-card" href="https://drift2drivequiz.com" target="_blank" rel="noopener">
-        <h3>📋 The Official Assessment</h3>
+        <h3><span class="cc-icon" data-icon="doc" aria-hidden="true"></span>The Official Assessment</h3>
         <p>Download Chris's full Complacency Assessment Profile and get an honest reading on where you're settling instead of excelling.</p>
         <span class="connect-go">drift2drivequiz.com →</span>
       </a>
       <a class="connect-card" href="https://www.maxwellleadership.com/speaker/chris-robinson/" target="_blank" rel="noopener">
-        <h3>🌍 Maxwell Leadership</h3>
+        <h3><span class="cc-icon" data-icon="globe" aria-hidden="true"></span>Maxwell Leadership</h3>
         <p>Chris is Executive Vice President of Maxwell Leadership — 50,000 certified coaches across 72 countries. Explore coaching, events, and training.</p>
         <span class="connect-go">maxwellleadership.com →</span>
       </a>
       <div class="connect-card">
-        <h3>📖 Get the Book</h3>
+        <h3><span class="cc-icon" data-icon="book" aria-hidden="true"></span>Get the Book</h3>
         <p><em>From Drift to Drive: A High Achiever's Guide to Breaking the Chains of Complacency</em> — available in print and audiobook, read by the author.</p>
         <span class="connect-go">Wherever books are sold</span>
       </div>
@@ -253,10 +253,31 @@
 </main>
 
 <footer class="footer">
-  <div class="road-line-footer" aria-hidden="true"></div>
-  <p><strong>From Drift to Drive</strong> · Chris Robinson · Maxwell Leadership</p>
-  <p class="footer-tag">What do you want? Go get it. Do something today to get there. <em>Godspeed, friend.</em></p>
-  <p class="fineprint">Unofficial companion app · All framework concepts and quotations from <em>From Drift to Drive</em> © Chris Robinson. Your entries are saved privately in this browser only.</p>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="footer-mark">D<i>·</i>D</span>
+        <p class="footer-word">From Drift <em>to</em> Drive</p>
+        <p class="footer-sub">A High Achiever's Guide to Breaking the Chains of Complacency</p>
+      </div>
+      <nav class="footer-col" aria-label="Screens">
+        <p class="footer-col-title">The App</p>
+        <a href="#/check">Drift Check</a>
+        <a href="#/steps">The Seven Steps</a>
+        <a href="#/challenge">30-Day Challenge</a>
+        <a href="#/garage">My Garage</a>
+      </nav>
+      <nav class="footer-col" aria-label="Chris Robinson">
+        <p class="footer-col-title">Chris Robinson</p>
+        <a href="https://www.chrisrobinsonspeaker.com" target="_blank" rel="noopener">Speaking</a>
+        <a href="https://www.maxwellleadership.com/speaker/chris-robinson/" target="_blank" rel="noopener">Maxwell Leadership</a>
+        <a href="https://drift2drivequiz.com" target="_blank" rel="noopener">The Assessment</a>
+      </nav>
+    </div>
+    <div class="footer-rule" aria-hidden="true"></div>
+    <p class="footer-tag">“What do you want? Go get it. Do something today to get there. <em>Godspeed, friend.</em>”</p>
+    <p class="footer-legal">Companion app to the book · All framework concepts and quotations © Chris Robinson · Your entries remain private to this browser</p>
+  </div>
 </footer>
 
 <script src="js/data.js"></script>
