@@ -512,10 +512,16 @@
   });
   renderChallenge();
 
-  /* ---------- Signup (demo) ---------- */
+  /* ---------- Signup ----------
+     DEMO ONLY: stores locally and shows a success state. Replace this
+     handler with your email platform's embed before public launch. */
   $("#signupForm").addEventListener("submit", (e) => {
     e.preventDefault();
+    const email = $("#signupEmail").value.trim();
+    store.set("signup", { email, date: new Date().toISOString() });
+    $("#signupForm").innerHTML =
+      '<p style="font-family:var(--font-display);font-size:1.15rem;color:#7FD49B;">🏁 You\'re in the drive!</p>';
     $("#signupNote").textContent =
-      "Thanks! This demo form isn't connected to an email service yet — hook up your provider in js/app.js to go live.";
+      "Welcome aboard — watch your inbox for new tools, challenge cohorts, and dates from Chris.";
   });
 })();
