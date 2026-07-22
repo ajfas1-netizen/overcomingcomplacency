@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>From Drift to Drive — Companion App | Chris Robinson</title>
+<meta name="description" content="The interactive companion to From Drift to Drive by Chris Robinson (Maxwell Leadership). Take the Drift Check, work the Seven-Step Framework, and run the 30-Day Drive Challenge." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230B1F3A'/%3E%3Cpath d='M32 8 L44 56 H38 L32 32 L26 56 H20 Z' fill='%23F2B01E'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="top">
+  <a class="nav-brand" href="#top">
+    <span class="nav-badge">D→D</span>
+    <span class="nav-title">From Drift <em>to</em> Drive</span>
+  </a>
+  <nav class="nav-links" id="navLinks">
+    <a href="#driftcheck">Drift Check</a>
+    <a href="#framework">The 7 Steps</a>
+    <a href="#challenge">30-Day Challenge</a>
+    <a href="#connect">Connect</a>
+  </nav>
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-inner">
+    <p class="hero-kicker">The interactive companion to the book by Chris Robinson · Foreword by John C. Maxwell</p>
+    <h1 class="hero-title">From <span class="drift">Drift</span><br/>to <span class="drive">Drive</span></h1>
+    <p class="hero-sub">A high achiever's guide to breaking the chains of complacency — <em>that secret place of satisfactory success.</em></p>
+    <div class="hero-ctas">
+      <a class="btn btn-gold" href="#driftcheck">Take the Drift Check</a>
+      <a class="btn btn-ghost" href="#framework">Explore the 7 Steps</a>
+    </div>
+  </div>
+  <div class="hero-road" aria-hidden="true">
+    <div class="road">
+      <div class="road-line"></div>
+    </div>
+  </div>
+</section>
+
+<!-- rumble strip divider + rotating quote -->
+<div class="rumble" aria-hidden="true"></div>
+<section class="quotebar">
+  <blockquote id="quoteText"></blockquote>
+  <cite id="quoteBy"></cite>
+  <button class="quote-next" id="quoteNext" aria-label="Next quote">↻</button>
+</section>
+<div class="rumble" aria-hidden="true"></div>
+
+<!-- ============ WHY / WAKE-UP ============ -->
+<section class="section section-paper" id="why">
+  <div class="wrap">
+    <p class="eyebrow">The wake-up</p>
+    <h2>Complacency isn't laziness.<br/>It's drowsiness at the wheel.</h2>
+    <div class="cols">
+      <p>Your calendar is full. The emails get answered. The checklist gets checked. But somewhere along a familiar road, the achiever slips into autopilot — relying on the same old methods to do the same old things, assuming the same old results. Rome did it. Richard Petty did it. Kodak, Blockbuster, and Pan&nbsp;Am did it. Historians even have a name for it: <strong>victory disease</strong>.</p>
+      <p>In the 1940s, engineers cut gashes into a New Jersey highway because drivers kept drifting into oncoming traffic. Those <strong>rumble strips</strong> now prevent 70% of drift accidents — a little sound along a familiar road that wakes the driver up. That's what this app is for: a rumble strip for your potential. Evaluate where you are, work the seven steps, and pull yourself back into the center lane of your purpose.</p>
+    </div>
+    <div class="stat-row">
+      <div class="stat-tile"><span class="stat-num">60%</span><span class="stat-label">of employees report feeling disengaged at work</span></div>
+      <div class="stat-tile"><span class="stat-num">$7.8T</span><span class="stat-label">the annual price tag of that disengagement</span></div>
+      <div class="stat-tile"><span class="stat-num">70%</span><span class="stat-label">of drift accidents prevented by a simple rumble strip</span></div>
+      <div class="stat-tile"><span class="stat-num">8%</span><span class="stat-label">of people reach their goals — the framework puts you there</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DRIFT CHECK ============ -->
+<section class="section section-navy" id="driftcheck">
+  <div class="wrap">
+    <p class="eyebrow gold">Self-assessment</p>
+    <h2>The Drift Check</h2>
+    <p class="lead" id="quizIntro"></p>
+
+    <div class="quiz-shell" id="quizShell">
+      <!-- start state -->
+      <div class="quiz-start" id="quizStart">
+        <p>Twelve honest questions. About two minutes. No wrong answers — only true ones.</p>
+        <button class="btn btn-gold" id="quizBegin">Start the Drift Check</button>
+        <p class="quiz-note" id="quizLastResult"></p>
+      </div>
+
+      <!-- question state -->
+      <div class="quiz-q hidden" id="quizQ">
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
+        <p class="quiz-count" id="quizCount"></p>
+        <h3 id="quizQuestion"></h3>
+        <div class="quiz-options" id="quizOptions"></div>
+      </div>
+
+      <!-- result state -->
+      <div class="quiz-result hidden" id="quizResult">
+        <p class="quiz-count">Your result</p>
+        <div class="gauge">
+          <div class="gauge-track" id="gaugeTrack">
+            <div class="gauge-zone" data-zone="drive"><span>Driver's Seat</span></div>
+            <div class="gauge-zone" data-zone="cruise"><span>Cruise Control</span></div>
+            <div class="gauge-zone" data-zone="drift"><span>Drifting</span></div>
+            <div class="gauge-pointer" id="gaugePointer" aria-hidden="true">▲</div>
+          </div>
+          <p class="gauge-caption">Drift score: <strong id="gaugeScore"></strong> / 36 — lower is better</p>
+        </div>
+        <h3 id="resultLabel"></h3>
+        <p class="result-headline" id="resultHeadline"></p>
+        <p id="resultMessage"></p>
+        <div class="result-moves">
+          <p class="result-moves-title">Your next three moves</p>
+          <ol id="resultMoves"></ol>
+        </div>
+        <div class="hero-ctas">
+          <a class="btn btn-gold" href="#framework">Start Step 1: Clarity</a>
+          <a class="btn btn-ghost" href="https://drift2drivequiz.com" target="_blank" rel="noopener">Take Chris's full assessment →</a>
+          <button class="btn btn-ghost" id="quizRetake">Retake</button>
+        </div>
+      </div>
+    </div>
+    <p class="fineprint">This quick check is inspired by the book's awareness questions. For the official downloadable Complacency Assessment Profile, visit <a href="https://drift2drivequiz.com" target="_blank" rel="noopener">drift2drivequiz.com</a>.</p>
+  </div>
+</section>
+
+<div class="rumble" aria-hidden="true"></div>
+
+<!-- ============ FRAMEWORK ============ -->
+<section class="section section-paper" id="framework">
+  <div class="wrap">
+    <p class="eyebrow">The roadmap</p>
+    <h2>The Seven-Step Framework</h2>
+    <p class="lead">Seven steps to replace complacency with vitality, purpose, and momentum. They build on each other — work them in order, and when you finish, loop back to Step 1. That's how you cut the head off the complacency monster, one lap at a time.</p>
+
+    <!-- mile-marker selector -->
+    <div class="mile-track" id="mileTrack" role="tablist" aria-label="Framework steps"></div>
+
+    <!-- step detail -->
+    <article class="step-panel" id="stepPanel"></article>
+  </div>
+</section>
+
+<div class="rumble" aria-hidden="true"></div>
+
+<!-- ============ 30-DAY CHALLENGE ============ -->
+<section class="section section-navy" id="challenge">
+  <div class="wrap">
+    <p class="eyebrow gold">Daily momentum</p>
+    <h2>The 30-Day Drive Challenge</h2>
+    <p class="lead">One small, specific action a day — a full lap through the framework in thirty days. Not hustle: <em>form</em>. Small steps are big moments in the development of your momentum.</p>
+
+    <div class="challenge-hud">
+      <div class="challenge-progress">
+        <div class="challenge-bar"><div class="challenge-bar-fill" id="challengeBarFill"></div></div>
+        <p id="challengeStats">0 of 30 days complete</p>
+      </div>
+      <div class="challenge-today" id="challengeToday"></div>
+    </div>
+
+    <div class="phase-legend" id="phaseLegend"></div>
+    <div class="challenge-grid" id="challengeGrid"></div>
+    <p class="fineprint"><button class="linklike" id="challengeReset">Reset my challenge progress</button></p>
+  </div>
+</section>
+
+<div class="rumble" aria-hidden="true"></div>
+
+<!-- ============ CONNECT ============ -->
+<section class="section section-paper" id="connect">
+  <div class="wrap">
+    <p class="eyebrow">Stay in the drive</p>
+    <h2>Keep your hands on the wheel</h2>
+    <div class="connect-cards">
+      <a class="connect-card" href="https://drift2drivequiz.com" target="_blank" rel="noopener">
+        <h3>📋 The Official Assessment</h3>
+        <p>Download Chris's full Complacency Assessment Profile and get an honest reading on where you're settling instead of excelling.</p>
+        <span class="connect-go">drift2drivequiz.com →</span>
+      </a>
+      <a class="connect-card" href="https://www.maxwellleadership.com" target="_blank" rel="noopener">
+        <h3>🌍 Maxwell Leadership</h3>
+        <p>Chris Robinson is Executive Vice President of Maxwell Leadership — 50,000 certified coaches across 72 countries. Explore coaching, events, and training.</p>
+        <span class="connect-go">maxwellleadership.com →</span>
+      </a>
+      <div class="connect-card">
+        <h3>📖 Get the Book</h3>
+        <p><em>From Drift to Drive: A High Achiever's Guide to Breaking the Chains of Complacency</em> — available in print and audiobook, read by the author.</p>
+        <span class="connect-go">Wherever books are sold</span>
+      </div>
+    </div>
+
+    <div class="signup" id="signup">
+      <h3>Join the drive</h3>
+      <p>Get new tools, challenge cohorts, and speaking dates from Chris.</p>
+      <form id="signupForm" class="signup-form">
+        <label class="visually-hidden" for="signupEmail">Email address</label>
+        <input type="email" id="signupEmail" placeholder="you@example.com" required />
+        <button class="btn btn-gold" type="submit">Sign me up</button>
+      </form>
+      <p class="fineprint" id="signupNote">Demo form — connect your email platform (Mailchimp, ConvertKit, etc.) to activate. See README.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="road-line-footer" aria-hidden="true"></div>
+  <p><strong>From Drift to Drive</strong> · Chris Robinson · Maxwell Leadership</p>
+  <p class="footer-tag">What do you want? Go get it. Do something today to get there. <em>Godspeed, friend.</em></p>
+  <p class="fineprint">Unofficial companion app · All framework concepts and quotations from <em>From Drift to Drive</em> © Chris Robinson. Your entries are saved privately in this browser only.</p>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
