@@ -155,18 +155,30 @@
   }
   showLastResult();
 
+  let quizLock = false;
+
+  function scrollQuizTop() {
+    const shell = $("#quizShell");
+    const top = shell.getBoundingClientRect().top + window.scrollY - 74;
+    if (window.scrollY > top + 30) window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+  }
+
   function renderQuestion() {
     const q = quiz.questions[qIdx];
     $("#quizCount").textContent = "Question " + (qIdx + 1) + " of " + quiz.questions.length;
     $("#quizQuestion").textContent = q.text;
     $("#quizProgressFill").style.width = ((qIdx / quiz.questions.length) * 100) + "%";
     const opts = q.type === "recency" ? quiz.recencyOptions : quiz.agreeOptions;
+    const chosen = answers[qIdx]; // only marked when revisiting via Back
     $("#quizOptions").innerHTML = opts.map((o, i) =>
-      '<button type="button" data-score="' + i + '">' + esc(o) + "</button>").join("");
+      '<button type="button" data-score="' + i + '"' + (chosen === i ? ' class="selected"' : "") + ">" +
+      "<span>" + esc(o) + "</span></button>").join("");
+    $("#quizBack").classList.toggle("hidden", qIdx === 0);
+    scrollQuizTop();
   }
 
   $("#quizBegin").addEventListener("click", () => {
-    qIdx = 0; answers = [];
+    qIdx = 0; answers = []; quizLock = false;
     $("#quizStart").classList.add("hidden");
     $("#quizResult").classList.add("hidden");
     $("#quizQ").classList.remove("hidden");
@@ -175,11 +187,25 @@
 
   $("#quizOptions").addEventListener("click", (e) => {
     const btn = e.target.closest("button[data-score]");
-    if (!btn) return;
-    answers.push(Number(btn.dataset.score));
-    qIdx++;
-    if (qIdx < quiz.questions.length) renderQuestion();
-    else showResult();
+    if (!btn || quizLock) return;
+    quizLock = true;
+    // show the choice before moving on
+    $$("button", $("#quizOptions")).forEach((b) => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    btn.blur();
+    answers[qIdx] = Number(btn.dataset.score);
+    setTimeout(() => {
+      quizLock = false;
+      qIdx++;
+      if (qIdx < quiz.questions.length) renderQuestion();
+      else showResult();
+    }, 500);
+  });
+
+  $("#quizBack").addEventListener("click", () => {
+    if (quizLock || qIdx === 0) return;
+    qIdx--;
+    renderQuestion();
   });
 
   function zoneFor(score) {
@@ -191,6 +217,7 @@
     const zone = zoneFor(score);
     $("#quizQ").classList.add("hidden");
     $("#quizResult").classList.remove("hidden");
+    scrollQuizTop();
     $("#gaugeScore").textContent = score;
     $("#resultLabel").innerHTML = dot(zone.color) + esc(zone.label);
     $("#resultHeadline").textContent = zone.headline;
